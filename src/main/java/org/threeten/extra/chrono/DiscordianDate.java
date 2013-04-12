@@ -1,13 +1,10 @@
 package org.threeten.extra.chrono;
 
-import org.threeten.bp.LocalDate;
-import org.threeten.bp.Period;
-import org.threeten.bp.chrono.ChronoLocalDate;
-import org.threeten.bp.chrono.Chronology;
-import org.threeten.bp.jdk8.DefaultInterfaceChronoLocalDate;
+import java.io.*;
+import org.threeten.bp.*;
+import org.threeten.bp.chrono.*;
+import org.threeten.bp.jdk8.*;
 import org.threeten.bp.temporal.*;
-
-import java.io.Serializable;
 
 /**
  * A date in the <a href="http://en.wikipedia.org/wiki/Discordian_calendar">Discordian Calendar</a> system.
@@ -45,7 +42,8 @@ public final class DiscordianDate
      * @param season      the season-of-year to represent, from 1 to 5.
      * @param dayOfSeason the day-of-season to represent, from 1 to 73.
      * @return the Discordian date, never null.
-     * @throws org.threeten.bp.DateTimeException if the value of any field is out of range.
+     * @throws org.threeten.bp.DateTimeException
+     *          if the value of any field is out of range.
      */
     public static DiscordianDate of(int year, int season, int dayOfSeason) {
         DiscordianChronology chronology = DiscordianChronology.INSTANCE;
@@ -62,7 +60,8 @@ public final class DiscordianDate
      * @param year      the year-of-era to represent.
      * @param dayOfYear the day-of-year to represent, from 1 to 365 (366 if {@code year} is a leap year).
      * @return the Discordian date, never null.
-     * @throws org.threeten.bp.DateTimeException if the value of any field is out of range.
+     * @throws org.threeten.bp.DateTimeException
+     *          if the value of any field is out of range.
      */
     public static DiscordianDate of(int year, int dayOfYear) {
         int isoYear = DiscordianChronology.INSTANCE.discordianToIsoYear(year);
@@ -76,7 +75,8 @@ public final class DiscordianDate
      *
      * @param year the year-of-era to represent.
      * @return the Discordian date, never null.
-     * @throws org.threeten.bp.DateTimeException if the value of any field is out of range.
+     * @throws org.threeten.bp.DateTimeException
+     *          if the value of any field is out of range.
      */
     public static DiscordianDate leapDayOf(int year) {
         return of(year, ST_TIBS_DAY);
@@ -166,8 +166,21 @@ public final class DiscordianDate
     }
 
     @Override
-    public ChronoLocalDate<DiscordianDate> plus(long l, TemporalUnit temporalUnit) {
-        throw new UnsupportedOperationException();
+    public ChronoLocalDate<DiscordianDate> plus(long amountToAdd, TemporalUnit unit) {
+        if (unit instanceof ChronoUnit) {
+            ChronoUnit f = (ChronoUnit) unit;
+            switch (f) {
+                case WEEKS:
+                    return plus(Jdk8Methods.safeMultiply(amountToAdd, DiscordianChronology.DAYS_PER_WEEK), ChronoUnit.DAYS);
+                case MONTHS:
+                    return plus(Jdk8Methods.safeMultiply(amountToAdd, DiscordianChronology.DAYS_PER_SEASON), ChronoUnit.DAYS);
+                case ERAS:
+                    throw new DateTimeException("Unable to add era, Discordian calendar system only has one era");
+                default:
+                    return new DiscordianDate(isoDate.plus(amountToAdd, unit));
+            }
+        }
+        return unit.addTo(this, amountToAdd);
     }
 
     @Override

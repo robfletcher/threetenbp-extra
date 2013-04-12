@@ -1,18 +1,12 @@
 package org.threeten.extra.chrono;
 
-import org.testng.Assert;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-import org.threeten.bp.DateTimeException;
-import org.threeten.bp.DayOfWeek;
-import org.threeten.bp.LocalDate;
-import org.threeten.bp.chrono.ChronoLocalDate;
-import org.threeten.bp.chrono.Chronology;
-import org.threeten.bp.chrono.IsoChronology;
-import org.threeten.bp.temporal.TemporalAdjusters;
-
+import org.testng.*;
+import org.testng.annotations.*;
+import org.threeten.bp.*;
+import org.threeten.bp.chrono.*;
+import org.threeten.bp.temporal.*;
 import static org.testng.Assert.*;
-import static org.threeten.extra.chrono.DiscordianDate.ST_TIBS_DAY;
+import static org.threeten.extra.chrono.DiscordianDate.*;
 
 @Test
 public class TestDiscordianChronology {
@@ -35,7 +29,7 @@ public class TestDiscordianChronology {
     //-----------------------------------------------------------------------
     @DataProvider(name = "samples")
     Object[][] data_samples() {
-        return new Object[][]{
+        return new Object[][] {
                 // YOLD era starts in 1166 BC
                 {DiscordianChronology.INSTANCE.date(0, 1, 1), LocalDate.of(-1166, 1, 1)},
                 // sanity check current date
@@ -83,7 +77,7 @@ public class TestDiscordianChronology {
 
     @DataProvider(name = "badDates")
     Object[][] data_badDates() {
-        return new Object[][]{
+        return new Object[][] {
                 // out of range season
                 {3179, 0, 0},
                 {3179, -1, 1},
@@ -143,7 +137,7 @@ public class TestDiscordianChronology {
     //-----------------------------------------------------------------------
     @DataProvider(name = "toString")
     Object[][] data_toString() {
-        return new Object[][]{
+        return new Object[][] {
                 {DiscordianChronology.INSTANCE.date(0, 1, 1), "Sweetmorn, Chaos 1, 0 YOLD"},
                 {DiscordianChronology.INSTANCE.date(3179, 2, 19), "Boomtime, Discord 19, 3179 YOLD"},
                 // 60th day of the year is St. Tib's Day if it is a leap year
@@ -191,7 +185,7 @@ public class TestDiscordianChronology {
 
     @DataProvider(name = "leapYears")
     Object[][] data_leapYears() {
-        return new Object[][]{
+        return new Object[][] {
                 {3179, false},
                 {3178, true},
                 {3066, false},
@@ -202,6 +196,27 @@ public class TestDiscordianChronology {
     @Test(dataProvider = "leapYears")
     public void test_isLeapYear(int prolepticYear, boolean isLeapYear) {
         assertEquals(DiscordianChronology.INSTANCE.isLeapYear(prolepticYear), isLeapYear);
+    }
+
+    //-----------------------------------------------------------------------
+    // plus()
+    //-----------------------------------------------------------------------
+
+    @DataProvider(name = "plus")
+    Object[][] data_plus() {
+        return new Object[][] {
+                {DiscordianChronology.INSTANCE.date(3179, 2, 29), 1, ChronoUnit.DAYS, DiscordianChronology.INSTANCE.date(3179, 2, 30)},
+                {DiscordianChronology.INSTANCE.date(3179, 2, 29), 1, ChronoUnit.WEEKS, DiscordianChronology.INSTANCE.date(3179, 2, 34)},
+                {DiscordianChronology.INSTANCE.date(3179, 2, 29), 1, ChronoUnit.MONTHS, DiscordianChronology.INSTANCE.date(3179, 3, 29)},
+                {DiscordianChronology.INSTANCE.date(3179, 2, 29), 1, ChronoUnit.YEARS, DiscordianChronology.INSTANCE.date(3180, 2, 29)},
+                {DiscordianChronology.INSTANCE.date(3179, 2, 29), 1, ChronoUnit.CENTURIES, DiscordianChronology.INSTANCE.date(3279, 2, 29)},
+                {DiscordianChronology.INSTANCE.dateYearDay(3178, ST_TIBS_DAY), 1, ChronoUnit.DAYS, DiscordianChronology.INSTANCE.date(3178, 3, 1)},
+        };
+    }
+
+    @Test(dataProvider = "plus")
+    public void test_plus(DiscordianDate ddate, long value, TemporalUnit unit, DiscordianDate expected) {
+        assertEquals(ddate.plus(value, unit), expected);
     }
 
 }
