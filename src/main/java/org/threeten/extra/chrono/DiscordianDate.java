@@ -1,6 +1,7 @@
 package org.threeten.extra.chrono;
 
 import java.io.*;
+
 import org.threeten.bp.*;
 import org.threeten.bp.chrono.*;
 import org.threeten.bp.jdk8.*;
@@ -189,21 +190,28 @@ public final class DiscordianDate
     }
 
     @Override
-    public long periodUntil(Temporal temporal, TemporalUnit unit) {
-        ChronoLocalDate<?> endDate = (ChronoLocalDate<?>) temporal;
+    public long periodUntil(Temporal endDateTime, TemporalUnit unit) {
+        if (!ChronoLocalDate.class.isAssignableFrom(endDateTime.getClass())) {
+            throw new DateTimeException("Unable to calculate period between objects of two different types");
+        }
+        ChronoLocalDate<?> end = (ChronoLocalDate<?>) endDateTime;
+        if (end.getChronology() != getChronology()) {
+            throw new DateTimeException("Unable to calculate period between two different chronologies");
+        }
+
         if (unit instanceof ChronoUnit) {
-            switch((ChronoUnit)unit) {
+            switch ((ChronoUnit) unit) {
                 case WEEKS:
-                    return isoDate.periodUntil(LocalDate.from(endDate), ChronoUnit.DAYS) / DiscordianChronology.DAYS_PER_WEEK;
+                    return isoDate.periodUntil(LocalDate.from(end), ChronoUnit.DAYS) / DiscordianChronology.DAYS_PER_WEEK;
                 case MONTHS:
-                    return isoDate.periodUntil(LocalDate.from(endDate), ChronoUnit.DAYS) / DiscordianChronology.DAYS_PER_SEASON;
+                    return isoDate.periodUntil(LocalDate.from(end), ChronoUnit.DAYS) / DiscordianChronology.DAYS_PER_SEASON;
                 case ERAS:
                     return 0;
                 default:
-                    return isoDate.periodUntil(LocalDate.from(endDate), unit);
+                    return isoDate.periodUntil(LocalDate.from(end), unit);
             }
         }
-        throw new DateTimeException("Don't know how to do that");
+        return unit.between(this, endDateTime);
     }
 
     @Override

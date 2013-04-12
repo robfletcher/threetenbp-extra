@@ -245,4 +245,17 @@ public class TestDiscordianChronology {
         assertEquals(ddate1.periodUntil(ddate2, unit), expected);
     }
 
+    @DataProvider(name = "badPeriodUntilArguments")
+    Object[][] data_badPeriodUntilArguments() {
+        return new Object[][] {
+                {DiscordianChronology.INSTANCE.dateNow(), ZonedDateTime.now(), ChronoUnit.DAYS},
+                {DiscordianChronology.INSTANCE.dateNow(), CopticChronology.INSTANCE.dateNow(), ChronoUnit.DAYS},
+        };
+    }
+
+    @Test(dataProvider = "badPeriodUntilArguments", expectedExceptions = DateTimeException.class)
+    public void test_periodUntilBadArguments(Temporal start, Temporal end, TemporalUnit unit) {
+        start.periodUntil(end, unit);
+    }
+
 }
