@@ -210,7 +210,10 @@ public class TestDiscordianChronology {
                 {DiscordianChronology.INSTANCE.date(3179, 2, 29), 1, ChronoUnit.MONTHS, DiscordianChronology.INSTANCE.date(3179, 3, 29)},
                 {DiscordianChronology.INSTANCE.date(3179, 2, 29), 1, ChronoUnit.YEARS, DiscordianChronology.INSTANCE.date(3180, 2, 29)},
                 {DiscordianChronology.INSTANCE.date(3179, 2, 29), 1, ChronoUnit.CENTURIES, DiscordianChronology.INSTANCE.date(3279, 2, 29)},
-                {DiscordianChronology.INSTANCE.dateYearDay(3178, ST_TIBS_DAY), 1, ChronoUnit.DAYS, DiscordianChronology.INSTANCE.date(3178, 3, 1)},
+                {DiscordianChronology.INSTANCE.dateYearDay(3178, ST_TIBS_DAY), 1, ChronoUnit.DAYS, DiscordianChronology.INSTANCE.date(3178, 1, 60)},
+                {DiscordianChronology.INSTANCE.dateYearDay(3178, ST_TIBS_DAY), 1, ChronoUnit.WEEKS, DiscordianChronology.INSTANCE.date(3178, 1, 64)},
+                {DiscordianChronology.INSTANCE.dateYearDay(3178, ST_TIBS_DAY), 1, ChronoUnit.MONTHS, DiscordianChronology.INSTANCE.date(3178, 2, 59)},
+                {DiscordianChronology.INSTANCE.dateYearDay(3178, ST_TIBS_DAY), 1, ChronoUnit.YEARS, DiscordianChronology.INSTANCE.date(3179, 1, 59)},
         };
     }
 
