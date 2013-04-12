@@ -184,9 +184,26 @@ public final class DiscordianDate
         return unit.addTo(this, amountToAdd);
     }
 
+    private long getEpochMonth() {
+        return (getYear() * DiscordianChronology.SEASONS_PER_YEAR) + (getSeason() - 1);
+    }
+
     @Override
-    public Period periodUntil(ChronoLocalDate<?> chronoLocalDate) {
-        throw new UnsupportedOperationException();
+    public Period periodUntil(ChronoLocalDate<?> endDate) {
+        DiscordianDate end = new DiscordianDate(LocalDate.from(endDate));
+        long totalMonths = end.getEpochMonth() - this.getEpochMonth();
+        int days = end.getDayOfSeason() - this.getDayOfSeason();
+        if (totalMonths > 0 && days < 0) {
+            totalMonths--;
+            ChronoLocalDate<DiscordianDate> calcDate = this.plus(totalMonths, ChronoUnit.MONTHS);
+            days = (int) (end.toEpochDay() - calcDate.toEpochDay());
+        } else if (totalMonths < 0 && days > 0) {
+            totalMonths++;
+            days -= end.lengthOfMonth();
+        }
+        long years = totalMonths / DiscordianChronology.SEASONS_PER_YEAR;
+        int months = (int) (totalMonths % DiscordianChronology.SEASONS_PER_YEAR);
+        return Period.of(Jdk8Methods.safeToInt(years), months, days);
     }
 
     @Override

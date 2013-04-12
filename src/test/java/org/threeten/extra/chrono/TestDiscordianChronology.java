@@ -258,4 +258,23 @@ public class TestDiscordianChronology {
         start.periodUntil(end, unit);
     }
 
+    //-----------------------------------------------------------------------
+    // periodUntil(ChronoLocalDate)
+    //-----------------------------------------------------------------------
+
+    @DataProvider(name = "periodDifferences")
+    Object[][] data_periodDifferences() {
+        return new Object[][] {
+                {DiscordianChronology.INSTANCE.dateNow(), DiscordianChronology.INSTANCE.dateNow(), Period.ZERO},
+                {DiscordianChronology.INSTANCE.date(3179, 1, 1), DiscordianChronology.INSTANCE.date(3179, 5, 73), Period.of(0, 4, 72)},
+                {DiscordianChronology.INSTANCE.date(1, 1, 1), DiscordianChronology.INSTANCE.date(3179, 5, 73), Period.of(3178, 4, 72)},
+                {DiscordianChronology.INSTANCE.date(3179, 5, 73), DiscordianChronology.INSTANCE.date(3179, 1, 1), Period.of(0, -4, -72)},
+        };
+    }
+
+    @Test(dataProvider = "periodDifferences")
+    public void test_periodDifference(ChronoLocalDate<?> startDate, ChronoLocalDate<?> endDate, Period expectedPeriod) {
+        assertEquals(startDate.periodUntil(endDate), expectedPeriod);
+    }
+
 }

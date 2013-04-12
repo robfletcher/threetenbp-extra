@@ -29,6 +29,7 @@ public final class DiscordianChronology extends Chronology implements Serializab
      */
     public static final DiscordianChronology INSTANCE = new DiscordianChronology();
 
+    public static final int SEASONS_PER_YEAR = 5;
     public static final int DAYS_PER_SEASON = 73;
     public static final int DAYS_PER_WEEK = 5;
     public static final int ISO_YEAR_OFFSET = 1166;
