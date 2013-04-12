@@ -189,8 +189,21 @@ public final class DiscordianDate
     }
 
     @Override
-    public long periodUntil(Temporal temporal, TemporalUnit temporalUnit) {
-        throw new UnsupportedOperationException();
+    public long periodUntil(Temporal temporal, TemporalUnit unit) {
+        ChronoLocalDate<?> endDate = (ChronoLocalDate<?>) temporal;
+        if (unit instanceof ChronoUnit) {
+            switch((ChronoUnit)unit) {
+                case WEEKS:
+                    return isoDate.periodUntil(LocalDate.from(endDate), ChronoUnit.DAYS) / DiscordianChronology.DAYS_PER_WEEK;
+                case MONTHS:
+                    return isoDate.periodUntil(LocalDate.from(endDate), ChronoUnit.DAYS) / DiscordianChronology.DAYS_PER_SEASON;
+                case ERAS:
+                    return 0;
+                default:
+                    return isoDate.periodUntil(LocalDate.from(endDate), unit);
+            }
+        }
+        throw new DateTimeException("Don't know how to do that");
     }
 
     @Override

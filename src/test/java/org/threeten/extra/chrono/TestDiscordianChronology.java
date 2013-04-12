@@ -5,6 +5,7 @@ import org.testng.annotations.*;
 import org.threeten.bp.*;
 import org.threeten.bp.chrono.*;
 import org.threeten.bp.temporal.*;
+
 import static org.testng.Assert.*;
 import static org.threeten.extra.chrono.DiscordianDate.*;
 
@@ -220,6 +221,28 @@ public class TestDiscordianChronology {
     @Test(dataProvider = "plus")
     public void test_plus(DiscordianDate ddate, long value, TemporalUnit unit, DiscordianDate expected) {
         assertEquals(ddate.plus(value, unit), expected);
+    }
+
+    //-----------------------------------------------------------------------
+    // periodUntil(Temporal, TemporalUnit)
+    //-----------------------------------------------------------------------
+
+    @DataProvider(name = "periods")
+    Object[][] data_periods() {
+        return new Object[][] {
+                {DiscordianChronology.INSTANCE.date(3179, 2, 29), DiscordianChronology.INSTANCE.date(3179, 2, 30), ChronoUnit.DAYS, 1},
+                {DiscordianChronology.INSTANCE.date(3179, 2, 29), DiscordianChronology.INSTANCE.date(3179, 2, 28), ChronoUnit.DAYS, -1},
+                {DiscordianChronology.INSTANCE.date(3179, 2, 29), DiscordianChronology.INSTANCE.date(3179, 3, 28), ChronoUnit.MONTHS, 0},
+                {DiscordianChronology.INSTANCE.date(3179, 2, 29), DiscordianChronology.INSTANCE.date(3179, 3, 29), ChronoUnit.MONTHS, 1},
+                {DiscordianChronology.INSTANCE.date(3179, 2, 29), DiscordianChronology.INSTANCE.date(3179, 4, 28), ChronoUnit.MONTHS, 1},
+                {DiscordianChronology.INSTANCE.date(3179, 2, 29), DiscordianChronology.INSTANCE.date(3179, 2, 24), ChronoUnit.WEEKS, -1},
+                {DiscordianChronology.INSTANCE.date(-1, 1, 1), DiscordianChronology.INSTANCE.date(3179, 2, 29), ChronoUnit.ERAS, 0},
+        };
+    }
+
+    @Test(dataProvider = "periods")
+    public void test_periodUntil(DiscordianDate ddate1, DiscordianDate ddate2, TemporalUnit unit, long expected) {
+        assertEquals(ddate1.periodUntil(ddate2, unit), expected);
     }
 
 }
