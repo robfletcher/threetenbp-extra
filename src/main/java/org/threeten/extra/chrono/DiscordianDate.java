@@ -10,10 +10,10 @@ import org.threeten.bp.temporal.*;
  * A date in the <a href="http://en.wikipedia.org/wiki/Discordian_calendar">Discordian Calendar</a> system.
  * <p/>
  * Since a Discordian year is the same length and uses the same leap-year pattern as an ISO year this class is simply a
- * wrapper around {@link org.threeten.bp.LocalDate}.
+ * wrapper around {@link LocalDate}.
  * <p/>
  * Note that since <em>St. Tib's Day</em> is considered "outside" the Discordian season and week the methods
- * {@link #getDayOfWeek()}, {@link #getDayOfSeason()} and {@link #getSeason()} will return <code>-1</code> for an
+ * {@link #getDayOfWeek()}, {@link #getDayOfSeason()} and {@link #getSeason()} will return <code>0</code> for an
  * instance of this class that represents the leap day (the 60th day of a leap year).
  * <p/>
  * Hail Eris! All hail Discordia!
@@ -36,14 +36,13 @@ public final class DiscordianDate
      * season-of-year and day-of-season.
      * <p/>
      * Note it is not possible to construct an instance representing the leap-day using this method as
-     * the leap day falls "outside" of the Discordian season. Instead use {@link #leapDayOf(int)}.
+     * the leap day falls "outside" of the Discordian season. Instead use {@link #ofLeapDay(int)}.
      *
      * @param year        the year-of-era to represent.
      * @param season      the season-of-year to represent, from 1 to 5.
      * @param dayOfSeason the day-of-season to represent, from 1 to 73.
      * @return the Discordian date, never null.
-     * @throws org.threeten.bp.DateTimeException
-     *          if the value of any field is out of range.
+     * @throws DateTimeException if the value of any field is out of range.
      */
     public static DiscordianDate of(int year, int season, int dayOfSeason) {
         DiscordianChronology chronology = DiscordianChronology.INSTANCE;
@@ -60,8 +59,7 @@ public final class DiscordianDate
      * @param year      the year-of-era to represent.
      * @param dayOfYear the day-of-year to represent, from 1 to 365 (366 if {@code year} is a leap year).
      * @return the Discordian date, never null.
-     * @throws org.threeten.bp.DateTimeException
-     *          if the value of any field is out of range.
+     * @throws DateTimeException if the value of any field is out of range.
      */
     public static DiscordianDate of(int year, int dayOfYear) {
         int isoYear = DiscordianChronology.INSTANCE.discordianToIsoYear(year);
@@ -75,10 +73,9 @@ public final class DiscordianDate
      *
      * @param year the year-of-era to represent.
      * @return the Discordian date, never null.
-     * @throws org.threeten.bp.DateTimeException
-     *          if the value of any field is out of range.
+     * @throws DateTimeException if the value of any field is out of range.
      */
-    public static DiscordianDate leapDayOf(int year) {
+    public static DiscordianDate ofLeapDay(int year) {
         return of(year, ST_TIBS_DAY);
     }
 
@@ -90,7 +87,7 @@ public final class DiscordianDate
         return dayOfYear;
     }
 
-    public DiscordianDate(LocalDate isoDate) {
+    DiscordianDate(LocalDate isoDate) {
         this.isoDate = isoDate;
     }
 
@@ -103,36 +100,36 @@ public final class DiscordianDate
 
     /**
      * Gets the season represented by this instance in the range 1 to 5. If this instance represents
-     * a leap day this method will return <em>-1</em>.
+     * a leap day this method will return <em>0</em>.
      */
     public int getSeason() {
         int dayOfYear = getLeapAdjustedDayOfYear();
-        if (dayOfYear == -1) {
-            return -1;
+        if (dayOfYear == 0) {
+            return 0;
         }
         return ((dayOfYear - 1) / DiscordianChronology.DAYS_PER_SEASON) + 1;
     }
 
     /**
      * Gets the day-of-season represented by this instance in the range 1 to 5. If this instance represents
-     * a leap day this method will return <em>-1</em>.
+     * a leap day this method will return <em>0</em>.
      */
     public int getDayOfSeason() {
         int dayOfYear = getLeapAdjustedDayOfYear();
-        if (dayOfYear == -1) {
-            return -1;
+        if (dayOfYear == 0) {
+            return 0;
         }
         return ((dayOfYear - 1) % DiscordianChronology.DAYS_PER_SEASON) + 1;
     }
 
     /**
      * Gets the day-of-week represented by this instance in the range 1 to 5. If this instance represents
-     * a leap day this method will return <em>-1</em>.
+     * a leap day this method will return <em>0</em>.
      */
     public int getDayOfWeek() {
         int dayOfYear = getLeapAdjustedDayOfYear();
-        if (dayOfYear == -1) {
-            return -1;
+        if (dayOfYear == 0) {
+            return 0;
         }
         return ((dayOfYear - 1) % DiscordianChronology.DAYS_PER_WEEK) + 1;
     }
@@ -157,7 +154,7 @@ public final class DiscordianDate
         int dayOfYear = isoDate.getDayOfYear();
         if (isoDate.isLeapYear()) {
             if (dayOfYear == ST_TIBS_DAY) {
-                return -1;
+                return 0;
             } else if (dayOfYear > ST_TIBS_DAY) {
                 return dayOfYear - 1;
             }
@@ -269,7 +266,16 @@ public final class DiscordianDate
     @Override
     public ValueRange range(TemporalField field) {
         if (field instanceof ChronoField) {
-            return getChronology().range((ChronoField) field);
+            switch ((ChronoField) field) {
+                case MONTH_OF_YEAR:
+                    return ValueRange.of(isLeapYear() ? 0 : 1, DiscordianChronology.SEASONS_PER_YEAR);
+                case DAY_OF_MONTH:
+                    return ValueRange.of(isLeapYear() ? 0 : 1, DiscordianChronology.DAYS_PER_SEASON);
+                case DAY_OF_WEEK:
+                    return ValueRange.of(isLeapYear() ? 0 : 1, DiscordianChronology.DAYS_PER_WEEK);
+                default:
+                    return getChronology().range((ChronoField) field);
+            }
         }
         return field.rangeRefinedBy(this);
     }
@@ -279,6 +285,7 @@ public final class DiscordianDate
         if (field instanceof ChronoField) {
             switch ((ChronoField) field) {
                 case YEAR_OF_ERA:
+                case YEAR:
                     return getYear();
                 case ERA:
                     return 1L;

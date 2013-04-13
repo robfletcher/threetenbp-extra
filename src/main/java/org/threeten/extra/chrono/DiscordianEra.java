@@ -1,16 +1,11 @@
 package org.threeten.extra.chrono;
 
-import org.threeten.bp.DateTimeException;
-import org.threeten.bp.chrono.ChronoLocalDate;
-import org.threeten.bp.chrono.Chronology;
-import org.threeten.bp.chrono.Era;
-import org.threeten.bp.format.DateTimeFormatterBuilder;
-import org.threeten.bp.format.TextStyle;
+import java.util.*;
+import org.threeten.bp.*;
+import org.threeten.bp.chrono.*;
+import org.threeten.bp.format.*;
 import org.threeten.bp.temporal.*;
-
-import java.util.Locale;
-
-import static org.threeten.bp.temporal.ChronoField.ERA;
+import static org.threeten.bp.temporal.ChronoField.*;
 
 /**
  * The era in the Discordian calendar system.

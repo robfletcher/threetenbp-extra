@@ -1,20 +1,16 @@
 package org.threeten.extra.chrono;
 
+import java.io.*;
+import java.util.*;
 import org.threeten.bp.*;
 import org.threeten.bp.chrono.*;
-import org.threeten.bp.temporal.ChronoField;
-import org.threeten.bp.temporal.TemporalAccessor;
-import org.threeten.bp.temporal.ValueRange;
-
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
+import org.threeten.bp.temporal.*;
 
 /**
  * The Discordian calendar system.
  * <p/>
  * This chronology defines the rules of the Discordian calendar system.
- * The Discordian calendar system uses years of the same length as the ISO calendar system. Each year has 6
+ * The Discordian calendar system uses years of the same length as the ISO calendar system. Each year has 5
  * <em>seasons</em> of 73 days. The year is further divided into 73 5-day weeks.
  * <p/>
  * Leap years occur on the same cycle as the ISO calendar system. The leap day itself occurs on the same day
@@ -32,6 +28,11 @@ public final class DiscordianChronology extends Chronology implements Serializab
     public static final int SEASONS_PER_YEAR = 5;
     public static final int DAYS_PER_SEASON = 73;
     public static final int DAYS_PER_WEEK = 5;
+
+    public static final ValueRange MONTH_OF_YEAR_RANGE = ValueRange.of(0, 1, SEASONS_PER_YEAR, SEASONS_PER_YEAR);
+    public static final ValueRange DAY_OF_MONTH_RANGE = ValueRange.of(0, 1, DAYS_PER_SEASON, DAYS_PER_SEASON);
+    public static final ValueRange DAY_OF_WEEK_RANGE = ValueRange.of(0, 1, DAYS_PER_WEEK, DAYS_PER_WEEK);
+
     public static final int ISO_YEAR_OFFSET = 1166;
 
     private static final List<String> SEASON_NAMES = Arrays.asList("Chaos", "Discord", "Confusion", "Bureaucracy", "The Aftermath");
@@ -53,7 +54,7 @@ public final class DiscordianChronology extends Chronology implements Serializab
 
     @Override
     public String getCalendarType() {
-        return "discordian";
+        return null;
     }
 
     @Override
@@ -137,10 +138,12 @@ public final class DiscordianChronology extends Chronology implements Serializab
     @Override
     public ValueRange range(ChronoField field) {
         switch (field) {
+            case MONTH_OF_YEAR:
+                return MONTH_OF_YEAR_RANGE;
             case DAY_OF_MONTH:
-                return ValueRange.of(1, DAYS_PER_SEASON);
-            case ALIGNED_WEEK_OF_MONTH:
-                return ValueRange.of(1, DAYS_PER_WEEK);
+                return DAY_OF_MONTH_RANGE;
+            case DAY_OF_WEEK:
+                return DAY_OF_WEEK_RANGE;
         }
         return IsoChronology.INSTANCE.range(field);
     }
@@ -176,21 +179,21 @@ public final class DiscordianChronology extends Chronology implements Serializab
     }
 
     /**
-     * Asserts that <code>season</code> falls in the valid range. Throws {@link org.threeten.bp.DateTimeException} otherwise.
+     * Asserts that <code>season</code> falls in the valid range. Throws {@link DateTimeException} otherwise.
      */
     public void checkValidSeason(int season) {
         checkValueInRange(season, ChronoField.MONTH_OF_YEAR);
     }
 
     /**
-     * Asserts that <code>dayOfSeason</code> falls in the valid range. Throws {@link org.threeten.bp.DateTimeException} otherwise.
+     * Asserts that <code>dayOfSeason</code> falls in the valid range. Throws {@link DateTimeException} otherwise.
      */
     public void checkValidDayOfSeason(int dayOfSeason) {
         checkValueInRange(dayOfSeason, ChronoField.DAY_OF_MONTH);
     }
 
     /**
-     * Asserts that <code>dayOfWeek</code> falls in the valid range. Throws {@link org.threeten.bp.DateTimeException} otherwise.
+     * Asserts that <code>dayOfWeek</code> falls in the valid range. Throws {@link DateTimeException} otherwise.
      */
     public void checkValidDayOfWeek(int dayOfWeek) {
         checkValueInRange(dayOfWeek, ChronoField.DAY_OF_WEEK);
