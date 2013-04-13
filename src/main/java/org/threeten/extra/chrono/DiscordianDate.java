@@ -1,7 +1,6 @@
 package org.threeten.extra.chrono;
 
 import java.io.*;
-
 import org.threeten.bp.*;
 import org.threeten.bp.chrono.*;
 import org.threeten.bp.jdk8.*;
@@ -185,14 +184,19 @@ public final class DiscordianDate
     }
 
     private long getEpochMonth() {
-        return (getYear() * DiscordianChronology.SEASONS_PER_YEAR) + (getSeason() - 1);
+        int season = getSeason();
+        // we need to cheat a bit for St. Tib's Day
+        if (isLeapDay()) {
+            season = 1;
+        }
+        return (getYear() * DiscordianChronology.SEASONS_PER_YEAR) + (season - 1);
     }
 
     @Override
     public Period periodUntil(ChronoLocalDate<?> endDate) {
         DiscordianDate end = new DiscordianDate(LocalDate.from(endDate));
         long totalMonths = end.getEpochMonth() - this.getEpochMonth();
-        int days = end.getDayOfSeason() - this.getDayOfSeason();
+        int days = (end.isLeapDay() ? ST_TIBS_DAY : end.getDayOfSeason()) - (isLeapDay() ? ST_TIBS_DAY : getDayOfSeason());
         if (totalMonths > 0 && days < 0) {
             totalMonths--;
             ChronoLocalDate<DiscordianDate> calcDate = this.plus(totalMonths, ChronoUnit.MONTHS);

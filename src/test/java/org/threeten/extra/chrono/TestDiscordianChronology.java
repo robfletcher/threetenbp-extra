@@ -269,6 +269,14 @@ public class TestDiscordianChronology {
                 {DiscordianChronology.INSTANCE.date(3179, 1, 1), DiscordianChronology.INSTANCE.date(3179, 5, 73), Period.of(0, 4, 72)},
                 {DiscordianChronology.INSTANCE.date(1, 1, 1), DiscordianChronology.INSTANCE.date(3179, 5, 73), Period.of(3178, 4, 72)},
                 {DiscordianChronology.INSTANCE.date(3179, 5, 73), DiscordianChronology.INSTANCE.date(3179, 1, 1), Period.of(0, -4, -72)},
+                {DiscordianChronology.INSTANCE.date(-1, 5, 73), DiscordianChronology.INSTANCE.date(1, 1, 1), Period.of(1, 0, 1)},
+                // St. Tib's Day handling is a little odd as it is only counted in the period if it is one of the operands
+                // this allows days > St. Tib's Day to always be exact years apart regardless of whether there was a leap
+                // year in between.
+                {DiscordianChronology.INSTANCE.dateYearDay(3178, ST_TIBS_DAY), DiscordianChronology.INSTANCE.date(3179, 1, 60), Period.of(1, 0, 0)},
+                {DiscordianChronology.INSTANCE.date(3179, 1, 60), DiscordianChronology.INSTANCE.dateYearDay(3178, ST_TIBS_DAY), Period.of(-1, 0, 0)},
+                {DiscordianChronology.INSTANCE.date(3179, 1, 60), DiscordianChronology.INSTANCE.date(3178, 1, 60), Period.of(-1, 0, 0)},
+                {DiscordianChronology.INSTANCE.date(3066, 1, 1), DiscordianChronology.INSTANCE.date(3179, 1, 1), Period.of(113, 0, 0)},
         };
     }
 
